@@ -1,0 +1,11 @@
+Expand deck size.
+Prize card area where 6 cards are set aside.
+The number of a type of card in the area determines the score of that card.
+Higher risk-reward play.
+
+Better AI to compensate.
+
+Different abilities for winning with each card.
+Scissors - mill the top 2 cards on the deck
+Paper - reshuffle hands
+Rock - prevent prize bonus from applying on the next win
