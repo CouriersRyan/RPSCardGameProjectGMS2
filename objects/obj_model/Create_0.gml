@@ -1,5 +1,8 @@
 /// @description Insert description here
 // You can write your code in this editor
+global.roundCount = 0;
+#macro max_rounds 4
+
 global.numcards = 24;
 global.deck = ds_list_create();
 global.discard = ds_list_create();
@@ -22,15 +25,16 @@ enum state {
 	resolve,
 	reshuffle,
 	shuffle,
-	prize
+	prize,
+	results
 }
 
 global.state = state.shuffle;
 
-#macro deck_x 160
-#macro deck_y 384
-#macro discard_x room_width - 160
-#macro discard_y 384
+#macro deck_x 200
+#macro deck_y 584
+#macro discard_x room_width - 260
+#macro discard_y 584
 #macro hand_x room_width / 2
 #macro max_prize_size 6
 #macro prize_x room_width
@@ -58,3 +62,4 @@ for(i = 0; i < global.numcards; i++){
 	
 	ds_list_insert(global.deck, 0, newcard);
 }
+global.roundCount += 1;

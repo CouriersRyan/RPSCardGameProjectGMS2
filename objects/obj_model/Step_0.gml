@@ -31,14 +31,14 @@ if(delay <= 0){
 			if(alarm[0] < 0) alarm[0] = 50;
 		break;
 	
-		//ai selects a card
 		case state.play:
 			if(global.aiChoice == noone) {
 				global.aiChoice = ds_list_find_value(global.aiHand, ai_pick_card());
-				move_card(global.aiChoice, hand_x, global.aiChoice.y + choiceOffset);
 			}
+			//player selects a card to play, and then the ai selects a card
 			if(global.selected != noone && mouse_check_button_pressed(mb_left)){
 				global.choice = global.selected;
+				move_card(global.aiChoice, hand_x, global.aiChoice.y + choiceOffset);
 				move_card(global.selected, hand_x, global.selected.y - choiceOffset);
 				global.state = state.compare;
 			}
@@ -92,7 +92,7 @@ if(delay <= 0){
 							card_victory_animation(global.prize[|i]);
 						}
 					}
-				} else is_bonus = true;
+				}
 			}
 			global.state = state.effect;
 		break;
@@ -100,8 +100,10 @@ if(delay <= 0){
 		case state.effect:
 			if (wait(1000, 0)) break;
 			if(global.winningCard){
+				is_bonus = true;
 				if(global.winningCard.card_type == face_index.rock){
 					is_bonus = false;
+					audio_play_sound(snd_rocks, 10, false);
 				} else if (global.winningCard.card_type == face_index.scissors){
 					if(scissored_cards < 2 && ds_list_size(global.deck) > 0){
 						var card = global.deck[| 0];
@@ -110,6 +112,8 @@ if(delay <= 0){
 						var size = ds_list_size(global.discard);
 						move_card(card, discard_x, discard_y - spacing * size);
 						card.depth = -size;
+						instance_create_layer(card.x, card.y, "Effects", obj_effect);
+						add_status(card, obj_scissors_icon, 24, 60);
 						scissored_cards++;
 						delay = 250;
 						break;
@@ -119,12 +123,14 @@ if(delay <= 0){
 					if(cards_in_hand > 0){
 						var card = global.hand[|cards_in_hand - 1];
 						card.face_up = true;
+						card.is_revealed = true;
 						ds_list_delete(global.hand, ds_list_find_index(global.hand, card));
 						if (card != global.choice){ 
 							ds_list_insert(global.deck, 0, card);
 							var size = ds_list_size(global.deck);
 							move_card(card, deck_x, deck_y - spacing * size);
 							card.depth = -size;
+							add_status(card, obj_paper_icon, -24, 60);
 						}
 						delay = 250;
 						break;
@@ -138,6 +144,7 @@ if(delay <= 0){
 							var size = ds_list_size(global.deck);
 							move_card(card, deck_x, deck_y - spacing * size);
 							card.depth = -size;
+							add_status(card, obj_paper_icon, -24, 60);
 						}
 						delay = 250;
 						break;
@@ -218,7 +225,17 @@ if(delay <= 0){
 				break;
 			}
 			ds_list_clear(global.discard);
+			instance_destroy(obj_icons);
+			is_bonus = true;
+			with(instance_nearest(x, y, obj_card_effect_manager)){
+				create_rock_icon();
+			}
 			is_shuffled = false;
+			if(global.roundCount >= max_rounds) {
+				global.state = state.results;
+				break;
+			}
+			global.roundCount++;
 			global.state = state.shuffle;
 		break;
 		
@@ -254,6 +271,10 @@ if(delay <= 0){
 				break;
 			}
 			global.state = state.setup;
+		break;
+		
+		case state.results:
+		
 		break;
 	}
 } else {

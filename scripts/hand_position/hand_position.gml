@@ -12,5 +12,5 @@ function hand_x_position(_index){
 }
 
 function prize_y_position(_index){
-	return prize_y - max_prize_size/2 * 75 + _index * 75;
+	return prize_y - max_prize_size/2 * 75 + 75 / 2 + _index * 75;
 }
